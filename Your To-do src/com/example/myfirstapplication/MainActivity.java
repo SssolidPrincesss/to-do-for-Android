@@ -7,7 +7,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,9 +25,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Room;
 
 import com.example.myfirstapplication.data.AppDatabase;
 import com.example.myfirstapplication.data.dao.NoteDao;
@@ -104,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         datePicker = findViewById(R.id.datePicker);
         timePicker = findViewById(R.id.timePicker);
 
-        // Растягиваем DatePicker на всю ширину
         DatePicker datePicker = findViewById(R.id.datePicker);
         if (datePicker != null) {
             datePicker.setLayoutParams(new LinearLayout.LayoutParams(
@@ -112,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
 
-            // Показываем календарь вместо спиннеров
             try {
                 datePicker.setCalendarViewShown(true);
                 datePicker.setSpinnersShown(false);
@@ -121,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Растягиваем TimePicker на всю ширину
         TimePicker timePicker = findViewById(R.id.timePicker);
         if (timePicker != null) {
             timePicker.setLayoutParams(new LinearLayout.LayoutParams(
@@ -149,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleEditMode() {
         isEditMode = !isEditMode;
-        loadCategories(); // Перезагружаем категории с новым режимом
+        loadCategories();
     }
     private void loadCategories() {
         noteDao.getAllCategories().observe(this, categories -> {
@@ -160,8 +153,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     private void addCategoryButton(String categoryName) {
         LinearLayout categoryContainer = new LinearLayout(this);
@@ -174,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
         containerParams.setMargins(0, 0, 8, 0);
         categoryContainer.setLayoutParams(containerParams);
 
-        // Кнопка категории
         Button categoryButton = new Button(this);
         categoryButton.setText(categoryName);
         categoryButton.setAllCaps(false);
@@ -204,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if (isEditMode && !categoryName.equals("All")) {
-            // Кнопка с тремя точками
             Button optionsButton = new Button(this);
             optionsButton.setText("⋯");
             optionsButton.setAllCaps(false);
@@ -220,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
             optionsParams.setMargins(4, 0, 0, 0);
             optionsButton.setLayoutParams(optionsParams);
 
-            // Кнопка удаления
             Button deleteCategoryButton = new Button(this);
             deleteCategoryButton.setText("✕");
             deleteCategoryButton.setAllCaps(false);
@@ -307,14 +295,13 @@ public class MainActivity extends AppCompatActivity {
                 resetInputFields();
                 displayNotes(currentCategory);
                 if (!finalCategory.equals("All")) {
-                    loadCategories(); // Refresh categories if new one was added
+                    loadCategories();
                 }
             });
         }).start();
     }
 
     private void displayNotes(String category) {
-        // Создаем effectively final переменную
         String displayCategory = category;
 
         noteDao.getActiveNotesByCategory(displayCategory).observe(this, notes -> {
@@ -345,9 +332,8 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         noteContainer.setPadding(0, 8, 0, 8);
-        noteContainer.setBackgroundColor(Color.WHITE); // Добавьте фон контейнера
+        noteContainer.setBackgroundColor(Color.WHITE);
 
-        // Delete Button
         Button deleteButton = new Button(this);
         deleteButton.setId(View.generateViewId());
         GradientDrawable deleteBackground = new GradientDrawable();
@@ -369,12 +355,11 @@ public class MainActivity extends AppCompatActivity {
 
         deleteButton.setOnClickListener(v -> deleteNote(note));
 
-        // Note Content
         LinearLayout noteContent = new LinearLayout(this);
         noteContent.setId(View.generateViewId());
         noteContent.setOrientation(LinearLayout.VERTICAL);
         noteContent.setBackgroundResource(R.drawable.note_background);
-        noteContent.setBackgroundColor(Color.WHITE); // Явно задаем белый фон
+        noteContent.setBackgroundColor(Color.WHITE);
 
         RelativeLayout.LayoutParams contentParams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -382,32 +367,28 @@ public class MainActivity extends AppCompatActivity {
         contentParams.addRule(RelativeLayout.START_OF, deleteButton.getId());
         noteContent.setLayoutParams(contentParams);
 
-        // Task Layout
         LinearLayout taskLayout = new LinearLayout(this);
         taskLayout.setOrientation(LinearLayout.HORIZONTAL);
         taskLayout.setGravity(Gravity.CENTER_VERTICAL);
         taskLayout.setPadding(16, 16, 16, 16);
-        taskLayout.setBackgroundColor(Color.WHITE); // Фон для taskLayout
+        taskLayout.setBackgroundColor(Color.WHITE);
 
-        // Checkbox
         CheckBox checkBox = new CheckBox(this);
         checkBox.setChecked(isCompleted);
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             toggleNoteCompletion(note, isChecked);
         });
 
-        // Note Text - ИСПРАВЛЕНО: добавлен явный цвет текста
         TextView noteView = new TextView(this);
         noteView.setText(note.text);
         noteView.setTextSize(16);
         noteView.setPadding(16, 0, 16, 0);
-        noteView.setTextColor(Color.BLACK); // Явно задаем черный цвет текста
+        noteView.setTextColor(Color.BLACK);
         if (isCompleted) {
             noteView.setPaintFlags(noteView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            noteView.setTextColor(Color.GRAY); // Серый для завершенных задач
+            noteView.setTextColor(Color.GRAY);
         }
 
-        // Add SubTask Button
         Button addSubTaskButton = new Button(this);
         addSubTaskButton.setText("+");
         addSubTaskButton.setAllCaps(false);
@@ -419,13 +400,11 @@ public class MainActivity extends AppCompatActivity {
         addSubTaskButton.setTextColor(Color.WHITE);
         addSubTaskButton.setOnClickListener(v -> showAddSubTaskDialog(note));
 
-        // Add views to task layout
         taskLayout.addView(checkBox);
         taskLayout.addView(noteView);
         taskLayout.addView(addSubTaskButton);
         noteContent.addView(taskLayout);
 
-        // Load and add subtasks
         new Thread(() -> {
             List<SubTask> subTasks = subTaskDao.getSubTasksForNote(note.id);
             runOnUiThread(() -> {
@@ -433,14 +412,14 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout subTasksLayout = new LinearLayout(MainActivity.this);
                     subTasksLayout.setOrientation(LinearLayout.VERTICAL);
                     subTasksLayout.setPadding(48, 0, 16, 16);
-                    subTasksLayout.setBackgroundColor(Color.WHITE); // Фон для подзадач
+                    subTasksLayout.setBackgroundColor(Color.WHITE);
 
                     for (SubTask subTask : subTasks) {
                         LinearLayout subTaskLayout = new LinearLayout(MainActivity.this);
                         subTaskLayout.setOrientation(LinearLayout.HORIZONTAL);
                         subTaskLayout.setGravity(Gravity.CENTER_VERTICAL);
                         subTaskLayout.setPadding(0, 8, 0, 0);
-                        subTaskLayout.setBackgroundColor(Color.WHITE); // Фон для каждой подзадачи
+                        subTaskLayout.setBackgroundColor(Color.WHITE);
 
                         CheckBox subTaskCheckBox = new CheckBox(MainActivity.this);
                         subTaskCheckBox.setChecked(subTask.isCompleted);
@@ -452,10 +431,10 @@ public class MainActivity extends AppCompatActivity {
                         subTaskView.setText(subTask.text);
                         subTaskView.setTextSize(14);
                         subTaskView.setPadding(16, 0, 0, 0);
-                        subTaskView.setTextColor(Color.BLACK); // Явно задаем черный цвет текста
+                        subTaskView.setTextColor(Color.BLACK);
                         if (subTask.isCompleted) {
                             subTaskView.setPaintFlags(subTaskView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                            subTaskView.setTextColor(Color.GRAY); // Серый для завершенных подзадач
+                            subTaskView.setTextColor(Color.GRAY);
                         }
 
                         subTaskLayout.addView(subTaskCheckBox);
@@ -466,7 +445,6 @@ public class MainActivity extends AppCompatActivity {
                     noteContent.addView(subTasksLayout);
                 }
 
-                // Deadline view - ИСПРАВЛЕНО
                 TextView deadlineView = new TextView(MainActivity.this);
                 deadlineView.setText(dateFormat.format(new Date(note.deadline)));
                 deadlineView.setTextSize(12);
@@ -474,10 +452,8 @@ public class MainActivity extends AppCompatActivity {
                 deadlineView.setTextColor(note.deadline < System.currentTimeMillis() ? Color.RED : Color.DKGRAY);
                 noteContent.addView(deadlineView);
 
-                // Swipe handler
                 setupSwipeHandler(noteContent, deleteButton, noteContainer);
 
-                // Add views to container
                 noteContainer.addView(deleteButton);
                 noteContainer.addView(noteContent);
                 container.addView(noteContainer);
@@ -579,7 +555,6 @@ public class MainActivity extends AppCompatActivity {
             noteDao.update(note);
 
             if (isCompleted) {
-                // Mark all subtasks as completed
                 List<SubTask> subTasks = subTaskDao.getSubTasksForNote(note.id);
                 for (SubTask subTask : subTasks) {
                     subTask.isCompleted = true;
@@ -623,7 +598,6 @@ public class MainActivity extends AppCompatActivity {
             subTask.isCompleted = isCompleted;
             subTaskDao.updateSubTaskStatus(subTask.id, isCompleted);
 
-            // Check if all subtasks are completed to update parent note
             List<SubTask> subTasks = subTaskDao.getSubTasksForNote(subTask.noteId);
             boolean allCompleted = true;
             for (SubTask st : subTasks) {
@@ -648,9 +622,9 @@ public class MainActivity extends AppCompatActivity {
         autoDeleteHandler.postDelayed(() -> {
             new Thread(() -> {
                 noteDao.deleteOldCompletedNotes(System.currentTimeMillis());
-                autoDeleteHandler.postDelayed(this::scheduleOldNotesDeletion, 3600000); // Check every hour
+                autoDeleteHandler.postDelayed(this::scheduleOldNotesDeletion, 3600000);
             }).start();
-        }, 3600000); // Initial delay 1 hour
+        }, 3600000);
     }
 
     private void resetInputFields() {
