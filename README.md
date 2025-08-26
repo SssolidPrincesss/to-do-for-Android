@@ -1,1 +1,0 @@
-# to-do-for-Android
